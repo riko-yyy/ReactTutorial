@@ -2,15 +2,19 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+//コンポーネント
+//クラスで記述する。render()を実装することでJSXとして利用できる
 class Square extends React.Component {
   render() {
-    return <button className="square"> {/* TODO */} </button>;
+    //親コンポーネントからのpropsを受け取る
+    return <button className="square"> {this.props.value} </button>;
   }
 }
 
 class Board extends React.Component {
+  //props(value)で子コンポーネントへ値を渡す
   renderSquare(i) {
-    return <Square />;
+    return <Square value={i} />;
   }
 
   render() {
