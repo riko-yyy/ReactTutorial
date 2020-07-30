@@ -5,9 +5,26 @@ import "./index.css";
 //コンポーネント
 //クラスで記述する。render()を実装することでJSXとして利用できる
 class Square extends React.Component {
+  //コンストラクタでstateを初期化
+  //サブクラスのコンストラクタでは親のコンストラクタを必ず呼ぶ
+  constructor(props) {
+    super(props);
+    this.state = { value: null };
+  }
+
   render() {
     //親コンポーネントからのpropsを受け取る
-    return <button className="square"> {this.props.value} </button>;
+    return (
+      <button
+        className="square"
+        onClick={() => {
+          //setStateを呼び出すことで、再renderする
+          this.setState({ value: "X" });
+        }}
+      >
+        {this.state.value}
+      </button>
+    );
   }
 }
 
