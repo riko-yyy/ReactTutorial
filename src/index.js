@@ -61,14 +61,34 @@ class Game extends React.Component {
           squares: Array(9).fill(null)
         }
       ],
+      stepNumber: 0,
       xIsNext: true
     };
   }
 
   render() {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
+
+    //movesにゲーム履歴をReactオブジェクトとして格納
+    const moves = history.map((step, move) => {
+      const desc = move ? "Go to move #" + move : "Go to game start";
+      return (
+        //Vueと同じように、keyが必要
+        //配列のindexは挿入、ソート時に変わるため非推奨
+        <li key={move}>
+          <button
+            onClick={() => {
+              this.jumpTo(move);
+            }}
+          >
+            {desc}
+          </button>
+        </li>
+      );
+    });
+
     let status;
     if (winner) {
       status = "Winner: " + winner;
@@ -87,10 +107,18 @@ class Game extends React.Component {
           />
         </div>{" "}
         <div className="game-info">
-          <div> {status} </div> <ol> {/* TODO */} </ol>{" "}
+          <div> {status} </div> <ol> {moves} </ol>{" "}
         </div>{" "}
       </div>
     );
+  }
+
+  //
+  jumpTo(step) {
+    this.setState({
+      stepNumber: step,
+      xIsNext: step % 2 === 0
+    });
   }
 
   //state(squares)を更新
@@ -101,7 +129,7 @@ class Game extends React.Component {
     //利点③：書き換えのタイミング＝再レンダリングと認識できる
 
     //配列のコピーを作成
-    const history = this.state.history;
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squeres = current.squares.slice();
 
@@ -114,6 +142,7 @@ class Game extends React.Component {
     //stateを更新
     this.setState({
       history: history.concat([{ squares: squeres }]),
+      stepNumber: history.length,
       xIsNext: !this.state.xIsNext
     });
   }
