@@ -4,34 +4,52 @@ import "./index.css";
 
 //コンポーネント
 //クラスで記述する。render()を実装することでJSXとして利用できる
+//自身でstateを持たなず、親へイベントを伝えるのみの「制御されたコンポーネント」
 class Square extends React.Component {
-  //コンストラクタでstateを初期化
-  //サブクラスのコンストラクタでは親のコンストラクタを必ず呼ぶ
-  constructor(props) {
-    super(props);
-    this.state = { value: null };
-  }
-
   render() {
     //親コンポーネントからのpropsを受け取る
     return (
       <button
         className="square"
         onClick={() => {
-          //setStateを呼び出すことで、再renderする
-          this.setState({ value: "X" });
+          //親コンポーネントからprops経由で渡ってきた関数を子で実行する
+          this.props.onClick();
         }}
       >
-        {this.state.value}
+        {this.props.value}
       </button>
     );
   }
 }
 
 class Board extends React.Component {
-  //props(value)で子コンポーネントへ値を渡す
+  //コンストラクタでstateを初期化
+  constructor(props) {
+    super(props);
+    this.state = {
+      squares: Array(9).fill(null)
+    };
+  }
+
+  //親のstateを更新したいため、そういう関数をprops(onclick)として渡す
   renderSquare(i) {
-    return <Square value={i} />;
+    return (
+      <Square
+        value={this.state.squares[i]}
+        onClick={() => {
+          this.handleClick(i);
+        }}
+      />
+    );
+  }
+
+  //state(squares)を更新
+  handleClick(i) {
+    //配列のコピーを作成
+    const squeres = this.state.squares.slice();
+    squeres[i] = "X";
+    //stateを更新
+    this.setState({ squares: squeres });
   }
 
   render() {
