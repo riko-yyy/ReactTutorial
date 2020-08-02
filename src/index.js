@@ -20,62 +20,21 @@ function Square(props) {
 }
 
 class Board extends React.Component {
-  //コンストラクタでstateを初期化
-  constructor(props) {
-    super(props);
-    this.state = {
-      squares: Array(9).fill(null),
-      xIsNext: true
-    };
-  }
-
   //親のstateを更新したいため、そういう関数をprops(onclick)として渡す
   renderSquare(i) {
     return (
       <Square
-        value={this.state.squares[i]}
+        value={this.props.squares[i]}
         onClick={() => {
-          this.handleClick(i);
+          this.props.onClick(i);
         }}
       />
     );
   }
 
-  //state(squares)を更新
-  handleClick(i) {
-    //イミュータブルにstateを書き換える
-    //利点①：ヒストリを保って再利用できる
-    //利点②：書き換えが行われたかどうかがオブジェクトレベルで判定できるため容易
-    //利点③：書き換えのタイミング＝再レンダリングと認識できる
-
-    //配列のコピーを作成
-    const squeres = this.state.squares.slice();
-
-    //既に勝負がついてたらreturn
-    if (calculateWinner(squeres) || squeres[i]) {
-      return;
-    }
-
-    squeres[i] = this.state.xIsNext ? "X" : "O";
-    //stateを更新
-    this.setState({
-      squares: squeres,
-      xIsNext: !this.state.xIsNext
-    });
-  }
-
   render() {
-    const winner = calculateWinner(this.state.squares);
-    let status;
-    if (winner) {
-      status = "Winner: " + winner;
-    } else {
-      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
-    }
-
     return (
       <div>
-        <div className="status"> {status} </div>{" "}
         <div className="board-row">
           {" "}
           {this.renderSquare(0)} {this.renderSquare(1)} {this.renderSquare(2)}{" "}
@@ -94,17 +53,69 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      history: [
+        {
+          squares: Array(9).fill(null)
+        }
+      ],
+      xIsNext: true
+    };
+  }
+
   render() {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const winner = calculateWinner(current.squares);
+    let status;
+    if (winner) {
+      status = "Winner: " + winner;
+    } else {
+      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+    }
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board
+            squares={current.squares}
+            onClick={i => {
+              this.handleClick(i);
+            }}
+          />
         </div>{" "}
         <div className="game-info">
-          <div> {/* status */} </div> <ol> {/* TODO */} </ol>{" "}
+          <div> {status} </div> <ol> {/* TODO */} </ol>{" "}
         </div>{" "}
       </div>
     );
+  }
+
+  //state(squares)を更新
+  handleClick(i) {
+    //イミュータブルにstateを書き換える
+    //利点①：ヒストリを保って再利用できる
+    //利点②：書き換えが行われたかどうかがオブジェクトレベルで判定できるため容易
+    //利点③：書き換えのタイミング＝再レンダリングと認識できる
+
+    //配列のコピーを作成
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const squeres = current.squares.slice();
+
+    //既に勝負がついてたらreturn
+    if (calculateWinner(squeres) || squeres[i]) {
+      return;
+    }
+
+    squeres[i] = this.state.xIsNext ? "X" : "O";
+    //stateを更新
+    this.setState({
+      history: history.concat([{ squares: squeres }]),
+      xIsNext: !this.state.xIsNext
+    });
   }
 }
 
