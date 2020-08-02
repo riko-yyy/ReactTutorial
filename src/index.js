@@ -24,7 +24,8 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      squares: Array(9).fill(null)
+      squares: Array(9).fill(null),
+      xIsNext: true
     };
   }
 
@@ -49,13 +50,16 @@ class Board extends React.Component {
 
     //配列のコピーを作成
     const squeres = this.state.squares.slice();
-    squeres[i] = "X";
+    squeres[i] = this.state.xIsNext ? "X" : "O";
     //stateを更新
-    this.setState({ squares: squeres });
+    this.setState({
+      squares: squeres,
+      xIsNext: !this.state.xIsNext
+    });
   }
 
   render() {
-    const status = "Next player: X";
+    const status = "Next player: " + (this.state.xIsNext ? "X" : "O");
 
     return (
       <div>
