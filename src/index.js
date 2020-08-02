@@ -45,6 +45,11 @@ class Board extends React.Component {
 
   //state(squares)を更新
   handleClick(i) {
+    //イミュータブルにstateを書き換える
+    //利点①：ヒストリを保って再利用できる
+    //利点②：書き換えが行われたかどうかがオブジェクトレベルで判定できるため容易
+    //利点③：書き換えのタイミング＝再レンダリングと認識できる
+
     //配列のコピーを作成
     const squeres = this.state.squares.slice();
     squeres[i] = "X";
