@@ -5,21 +5,18 @@ import "./index.css";
 //コンポーネント
 //クラスで記述する。render()を実装することでJSXとして利用できる
 //自身でstateを持たなず、親へイベントを伝えるのみの「制御されたコンポーネント」
-class Square extends React.Component {
-  render() {
-    //親コンポーネントからのpropsを受け取る
-    return (
-      <button
-        className="square"
-        onClick={() => {
-          //親コンポーネントからprops経由で渡ってきた関数を子で実行する
-          this.props.onClick();
-        }}
-      >
-        {this.props.value}
-      </button>
-    );
-  }
+//この場合renderメソッドのみ所有しているので、classでなくfunctionで事足りる。これを「関数コンポーネント」と呼ぶ
+function Square(props) {
+  //親コンポーネントからのpropsを受け取る
+  return (
+    <button
+      className="square"
+      //親コンポーネントからprops経由で渡ってきた関数を子で実行する
+      onClick={props.onClick}
+    >
+      {props.value}
+    </button>
+  );
 }
 
 class Board extends React.Component {
