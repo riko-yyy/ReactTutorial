@@ -83,6 +83,7 @@ class Game extends React.Component {
         //配列のindexは挿入、ソート時に変わるため非推奨
         <li key={move}>
           <button
+            class={move === this.state.stepNumber ? "current" : ""}
             onClick={() => {
               this.jumpTo(move);
             }}
