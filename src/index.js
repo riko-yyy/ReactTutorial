@@ -46,6 +46,12 @@ class Board extends React.Component {
   }
 }
 
+function Toggle(props) {
+  return (
+    <button onClick={props.onClick}>{props.isToggleOn ? "ASC" : "DESC"}</button>
+  );
+}
+
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -57,7 +63,8 @@ class Game extends React.Component {
         }
       ],
       stepNumber: 0,
-      xIsNext: true
+      xIsNext: true,
+      isToggleOn: true
     };
   }
 
@@ -88,6 +95,8 @@ class Game extends React.Component {
       );
     });
 
+    const sortedMoves = this.state.isToggleOn ? moves : moves.reverse();
+
     let status;
     if (winner) {
       status = "Winner: " + winner;
@@ -106,10 +115,23 @@ class Game extends React.Component {
           />
         </div>{" "}
         <div className="game-info">
-          <div> {status} </div> <ol> {moves} </ol>{" "}
+          <div> {status} </div>
+          <Toggle
+            onClick={() => {
+              this.switchToggle();
+            }}
+            isToggleOn={this.state.isToggleOn}
+          />
+          <ol> {sortedMoves} </ol>{" "}
         </div>{" "}
       </div>
     );
+  }
+
+  switchToggle() {
+    this.setState({
+      isToggleOn: !this.state.isToggleOn
+    });
   }
 
   //indexから座標を計算する
