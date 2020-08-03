@@ -58,7 +58,8 @@ class Game extends React.Component {
     this.state = {
       history: [
         {
-          squares: Array(9).fill(null)
+          squares: Array(9).fill(null),
+          pointIndex: -1
         }
       ],
       stepNumber: 0,
@@ -72,8 +73,11 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
 
     //movesにゲーム履歴をReactオブジェクトとして格納
-    const moves = history.map((step, move) => {
-      const desc = move ? "Go to move #" + move : "Go to game start";
+    const moves = history.map((step, move, squares) => {
+      const point = this.calculatePointByIndex(step.pointIndex);
+      const desc = move
+        ? "Go to move #" + move + " (" + point.col + "," + point.row + ")"
+        : "Go to game start";
       return (
         //Vueと同じように、keyが必要
         //配列のindexは挿入、ソート時に変わるため非推奨
@@ -113,6 +117,14 @@ class Game extends React.Component {
     );
   }
 
+  //indexから座標を計算する
+  calculatePointByIndex(i) {
+    return {
+      col: i % 3,
+      row: Math.floor(i / 3)
+    };
+  }
+
   //
   jumpTo(step) {
     this.setState({
@@ -141,7 +153,7 @@ class Game extends React.Component {
     squeres[i] = this.state.xIsNext ? "X" : "O";
     //stateを更新
     this.setState({
-      history: history.concat([{ squares: squeres }]),
+      history: history.concat([{ squares: squeres, pointIndex: i }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext
     });
