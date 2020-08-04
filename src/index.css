@@ -50,7 +50,7 @@ ul {
   margin-left: 20px;
 }
 
-.current {
+.highlight {
   background-color: darkred;
   color: white;
 }

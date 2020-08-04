@@ -10,7 +10,7 @@ function Square(props) {
   //親コンポーネントからのpropsを受け取る
   return (
     <button
-      className="square"
+      className={"square" + " " + props.className}
       //親コンポーネントからprops経由で渡ってきた関数を子で実行する
       onClick={props.onClick}
     >
@@ -24,7 +24,12 @@ class Board extends React.Component {
   renderSquare(i) {
     return (
       <Square
-        value={this.props.squares[i]}
+        value={this.props.current.squares[i]}
+        className={
+          this.props.current.isGameOver && this.props.current.pointIndex === i
+            ? "highlight"
+            : ""
+        }
         onClick={() => {
           this.props.onClick(i);
         }}
@@ -59,7 +64,8 @@ class Game extends React.Component {
       history: [
         {
           squares: Array(9).fill(null),
-          pointIndex: -1
+          pointIndex: -1,
+          isGameOver: false
         }
       ],
       stepNumber: 0,
@@ -74,7 +80,7 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
 
     //movesにゲーム履歴をReactオブジェクトとして格納
-    const moves = history.map((step, move, squares) => {
+    const moves = history.map((step, move) => {
       const point = this.calculatePointByIndex(step.pointIndex);
       const desc = move
         ? "Go to move #" + move + " (" + point.col + "," + point.row + ")"
@@ -84,7 +90,7 @@ class Game extends React.Component {
         //配列のindexは挿入、ソート時に変わるため非推奨
         <li key={move}>
           <button
-            class={move === this.state.stepNumber ? "current" : ""}
+            className={move === this.state.stepNumber ? "highlight" : ""}
             onClick={() => {
               this.jumpTo(move);
             }}
@@ -94,11 +100,10 @@ class Game extends React.Component {
         </li>
       );
     });
-
     const sortedMoves = this.state.isToggleOn ? moves : moves.reverse();
 
     let status;
-    if (winner) {
+    if (current.isGameOver) {
       status = "Winner: " + winner;
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
@@ -108,7 +113,7 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <Board
-            squares={current.squares}
+            current={current}
             onClick={i => {
               this.handleClick(i);
             }}
@@ -167,10 +172,20 @@ class Game extends React.Component {
       return;
     }
 
+    //盤の状態を更新
     squeres[i] = this.state.xIsNext ? "X" : "O";
+
+    //今回の番手で勝負がついているか判定
+    let isGameOver = false;
+    if (calculateWinner(squeres)) {
+      isGameOver = true;
+    }
+
     //stateを更新
     this.setState({
-      history: history.concat([{ squares: squeres, pointIndex: i }]),
+      history: history.concat([
+        { squares: squeres, pointIndex: i, isGameOver: isGameOver }
+      ]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext
     });
