@@ -26,7 +26,9 @@ class Board extends React.Component {
       <Square
         value={this.props.current.squares[i]}
         className={
-          this.props.current.isGameOver && this.props.current.pointIndex === i
+          this.props.current.isGameOver &&
+          this.props.current.winner &&
+          this.props.current.pointIndex === i
             ? "highlight"
             : ""
         }
@@ -65,7 +67,8 @@ class Game extends React.Component {
         {
           squares: Array(9).fill(null),
           pointIndex: -1,
-          isGameOver: false
+          isGameOver: false,
+          winner: null
         }
       ],
       stepNumber: 0,
@@ -103,8 +106,10 @@ class Game extends React.Component {
     const sortedMoves = this.state.isToggleOn ? moves : moves.reverse();
 
     let status;
-    if (current.isGameOver) {
+    if (current.isGameOver && current.winner) {
       status = "Winner: " + winner;
+    } else if (current.isGameOver && !current.winner) {
+      status = "Draw";
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
@@ -176,15 +181,26 @@ class Game extends React.Component {
     squeres[i] = this.state.xIsNext ? "X" : "O";
 
     //今回の番手で勝負がついているか判定
+    const endNumber = 9;
     let isGameOver = false;
-    if (calculateWinner(squeres)) {
+    const winner = calculateWinner(squeres);
+    if (winner) {
+      //勝者あり
+      isGameOver = true;
+    } else if (history.length === endNumber) {
+      //ドロー
       isGameOver = true;
     }
 
     //stateを更新
     this.setState({
       history: history.concat([
-        { squares: squeres, pointIndex: i, isGameOver: isGameOver }
+        {
+          squares: squeres,
+          pointIndex: i,
+          isGameOver: isGameOver,
+          winner: winner
+        }
       ]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext
